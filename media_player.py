@@ -11,6 +11,8 @@ class MediaPlayer:
         self.HISTORY = Path("play_history.json")
         self.MUSIC_FOLDER = music_folder
 
+        self.current_song = ""
+
     def load_history(self):
         if not self.HISTORY.exists():
             return {"tracks": {}}
@@ -18,10 +20,15 @@ class MediaPlayer:
             return json.load(f)
 
     def play_song(self, song: str):
+        self.current_song = song
         data = self.load_history()
 
         song = f"{self.MUSIC_FOLDER}/{song}"
-        song_metadata = mutagen.File(song, easy=True)
+        try:
+            song_metadata = mutagen.File(song, easy=True)
+        except Exception as e:
+            song_metadata = mutagen.File(self.song_title_to_song(song), easy=True)
+            print("Exception caught, forgot to convert song title to song")
         if song_metadata:
             title = song_metadata.get("title", "Unknown Title")[0]
             print(f"Playing: {title}")
@@ -43,6 +50,26 @@ class MediaPlayer:
         mixer.init()
         mixer.music.load(song)
         mixer.music.play()
+
+    def pause(self):
+        mixer.music.pause()
+
+    def unpause(self):
+        mixer.music.unpause()
+
+    def stop(self):
+        mixer.music.stop()
+        self.current_song = ""
+
+    def restart(self):
+        song = self.current_song
+        self.stop()
+        self.play_song(song)
+
+    def get_finished(self) -> bool:
+        if mixer.music.get_pos() == -1:
+            return True
+        return False
 
     def preview_song_titles(self):
         songs = os.listdir(self.MUSIC_FOLDER)
