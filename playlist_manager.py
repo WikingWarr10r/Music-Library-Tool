@@ -63,4 +63,4 @@ class PlaylistManager:
     def run_playlist(self, media_player):
         if media_player.get_finished():
             self.next_song()
-            self.play_song()
+            self.play_song(media_player)
