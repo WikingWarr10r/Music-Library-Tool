@@ -1,9 +1,8 @@
 from media_player import MediaPlayer
-import os
 
 media_player = MediaPlayer("music/")
 
-media_player.preview_song_titles(os.listdir(media_player.MUSIC_FOLDER))
+media_player.preview_song_titles()
 
 current_song = media_player.song_title_to_song(input('Enter song to play: '))
 

@@ -44,7 +44,8 @@ class MediaPlayer:
         mixer.music.load(song)
         mixer.music.play()
 
-    def preview_song_titles(self, songs):
+    def preview_song_titles(self):
+        songs = os.listdir(self.MUSIC_FOLDER)
         for sng in songs:
             song = f"{self.MUSIC_FOLDER}/{sng}"
             song_metadata = mutagen.File(song, easy=True)
