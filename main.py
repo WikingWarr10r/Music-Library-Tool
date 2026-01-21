@@ -1,3 +1,5 @@
+import threading
+import time
 from media_player import MediaPlayer
 from playlist_manager import PlaylistManager
 
@@ -9,9 +11,17 @@ playlist_manager.get_playlist("IAMMUSIC")
 
 playlist_manager.play_song(media_player)
 
-while True:
-    playlist_manager.run_playlist(media_player)
+running = True
 
+def playlist_loop():
+    while running:
+        playlist_manager.run_playlist(media_player)
+        time.sleep(0.1)
+
+playlist_thread = threading.Thread(target=playlist_loop, daemon=True)
+playlist_thread.start()
+
+while True:
     action = input("Do you want to pause, unpause, stop or restart: ").strip().lower()
     if action == "pause":
         media_player.pause()
@@ -28,4 +38,3 @@ while True:
     if action == "restart":
         media_player.restart()
         print("Restarting Song")
-    
