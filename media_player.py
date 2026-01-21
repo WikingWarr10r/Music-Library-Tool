@@ -62,9 +62,7 @@ class MediaPlayer:
         self.current_song = ""
 
     def restart(self):
-        song = self.current_song
-        self.stop()
-        self.play_song(song)
+        mixer.music.set_pos(0)
 
     def get_finished(self) -> bool:
         if mixer.music.get_pos() == -1:
