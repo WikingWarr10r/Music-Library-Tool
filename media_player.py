@@ -5,6 +5,7 @@ from pygame import mixer
 import json
 from pathlib import Path
 import datetime
+import time
 
 class MediaPlayer:
     def __init__(self, music_folder):
@@ -12,6 +13,7 @@ class MediaPlayer:
         self.MUSIC_FOLDER = music_folder
 
         self.current_song = ""
+        self.length = 0
 
     def load_history(self):
         if not self.HISTORY.exists():
@@ -31,6 +33,7 @@ class MediaPlayer:
             print("Exception caught, forgot to convert song title to song")
         if song_metadata:
             title = song_metadata.get("title", "Unknown Title")[0]
+            self.length = song_metadata.info.length
             print(f"Playing: {title}")
         else:
             print(f"Couldn't read metadata for {song}")
@@ -68,6 +71,9 @@ class MediaPlayer:
         if mixer.music.get_pos() == -1:
             return True
         return False
+    
+    def get_time(self):
+        return f"{time.strftime('%M:%S', time.gmtime(mixer.music.get_pos() / 1000))}/{time.strftime('%M:%S', time.gmtime(self.length))}"
 
     def preview_song_titles(self):
         songs = os.listdir(self.MUSIC_FOLDER)

@@ -52,6 +52,12 @@ class PlaylistManager:
 
     def get_song_in_playlist(self):
         return self.playlists[self.current_playlist][self.song_index]
+    
+    def get_playlists(self):
+        return self.playlists
+    
+    def get_tracklist(self):
+        return self.playlists[self.current_playlist][self.song_index:]
 
     def next_song(self):
         playlist = self.playlists[self.current_playlist]
