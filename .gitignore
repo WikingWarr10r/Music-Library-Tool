@@ -182,3 +182,4 @@ cython_debug/
 
 music
 playlists
+play_history.json
