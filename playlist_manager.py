@@ -1,12 +1,14 @@
 import csv
+import time
 
 class PlaylistManager:
-    def __init__(self, playlist_folder):
+    def __init__(self, playlist_folder, media_player):
         self.playlist_folder = playlist_folder
         self.playlists = {}
 
         self.current_playlist = ""
         self.song_index = 0
+        self.media_player = media_player
 
     def load(self):
         with open(f"{self.playlist_folder}/playlists.csv", newline="") as f:
@@ -23,14 +25,14 @@ class PlaylistManager:
             for name, songs in self.playlists.items():
                 writer.writerow([name, *songs])
     
-    def create_playlist(self, media_player):
+    def create_playlist(self):
         playlist_name = input("Enter playlist name: ")
 
         if playlist_name in self.playlists:
             print("Playlist already exists")
             return
 
-        media_player.preview_song_titles()
+        self.media_player.preview_song_titles()
 
         songs = []
         while True:
@@ -38,7 +40,7 @@ class PlaylistManager:
             if song == "":
                 break
 
-            if media_player.song_title_to_song(song) is not None:
+            if self.media_player.song_title_to_song(song) is not None:
                 songs.append(song)
             else:
                 print(f"The song {song} was not found")
@@ -47,7 +49,21 @@ class PlaylistManager:
         self.write_playlists()
 
     def get_playlist(self, name):
-        self.current_playlist = name
+        if name.isdigit():
+            index = int(name) - 1
+            playlist_names = list(self.playlists.keys())
+
+            if 0 <= index < len(playlist_names):
+                self.current_playlist = playlist_names[index]
+            else:
+                print("Invalid playlist number")
+                return
+        else:
+            if name not in self.playlists:
+                print("Playlist not found")
+                return
+            self.current_playlist = name
+
         self.song_index = 0
 
     def get_song_in_playlist(self):
@@ -63,10 +79,15 @@ class PlaylistManager:
         playlist = self.playlists[self.current_playlist]
         self.song_index = (self.song_index + 1) % len(playlist)
 
-    def play_song(self, media_player):
-        media_player.play_song(media_player.song_title_to_song(self.get_song_in_playlist()))
+    def play_song(self):
+        self.media_player.play_song(self.media_player.song_title_to_song(self.get_song_in_playlist()))
 
-    def run_playlist(self, media_player):
-        if media_player.get_finished():
+    def run_playlist(self):
+        if self.media_player.get_finished():
             self.next_song()
-            self.play_song(media_player)
+            self.play_song()
+
+    def playlist_loop(self):
+        while True:
+            self.run_playlist()
+            time.sleep(0.1)

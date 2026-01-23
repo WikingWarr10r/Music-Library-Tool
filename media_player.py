@@ -15,6 +15,10 @@ class MediaPlayer:
         self.current_song = ""
         self.length = 0
 
+        self.looping_song = None
+
+        self.sub_ms = 0
+
     def load_history(self):
         if not self.HISTORY.exists():
             return {"tracks": {}}
@@ -22,6 +26,7 @@ class MediaPlayer:
             return json.load(f)
 
     def play_song(self, song: str):
+        self.sub_ms = 0
         self.current_song = song
         data = self.load_history()
 
@@ -65,6 +70,7 @@ class MediaPlayer:
         self.current_song = ""
 
     def restart(self):
+        self.sub_ms = mixer.music.get_pos()
         mixer.music.set_pos(0)
 
     def get_finished(self) -> bool:
@@ -73,7 +79,24 @@ class MediaPlayer:
         return False
     
     def get_time(self):
-        return f"{time.strftime('%M:%S', time.gmtime(mixer.music.get_pos() / 1000))}/{time.strftime('%M:%S', time.gmtime(self.length))}"
+        if not self.current_song == None:
+            return f"{time.strftime('%M:%S', time.gmtime((mixer.music.get_pos() - self.sub_ms) / 1000))}/{time.strftime('%M:%S', time.gmtime(self.length))}"
+        else:
+            return "No song playing"
+        
+    def start_looping(self):
+        self.looping_song = self.current_song
+    
+    def stop_looping(self):
+        self.looping_song = None
+
+    def looping_loop(self):
+        while True:
+            if not self.looping_song == None:
+                if self.get_finished():
+                    self.current_song = self.looping_song
+                    self.play_song(self.current_song)
+            time.sleep(0.1)
 
     def preview_song_titles(self):
         songs = os.listdir(self.MUSIC_FOLDER)
