@@ -98,6 +98,9 @@ class MediaPlayer:
                     self.play_song(self.current_song)
             time.sleep(0.1)
 
+    def set_volume(self, volume):
+        mixer.music.set_volume(volume)
+
     def preview_song_titles(self):
         songs = os.listdir(self.MUSIC_FOLDER)
         for sng in songs:

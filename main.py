@@ -3,7 +3,7 @@ from playlist_manager import PlaylistManager
 from helpers import best_match
 import threading
 
-COMMANDS = ["pause", "unpause", "skip", "restart", "list", "time", "stop", "loop", "unloop", "play", "help"]
+COMMANDS = ["pause", "unpause", "skip", "restart", "list", "time", "stop", "loop", "unloop", "play", "volume", "help"]
 
 media_player = MediaPlayer("music/")
 
@@ -76,6 +76,8 @@ elif "play" in choice.lower():
                 media_player.preview_song_titles()
                 current_song = media_player.song_title_to_song(input('Enter song to play: '))
                 media_player.play_song(current_song)
+            if action == "volume":
+                media_player.set_volume(float(input("Enter Volume: "))/100)
             if action == "help":
                 print("Available Actions:")
                 for command in COMMANDS:
