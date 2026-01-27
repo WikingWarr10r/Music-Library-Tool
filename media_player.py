@@ -120,3 +120,11 @@ class MediaPlayer:
                 if song_metadata.get("title")[0] == title:
                     return song
         return None
+    
+    def song_title_to_metadata(self, title) -> dict:
+        for song in os.listdir(self.MUSIC_FOLDER):
+            song_metadata = mutagen.File(f"{self.MUSIC_FOLDER}/{song}", easy=True)
+            if song_metadata:
+                if song_metadata.get("title")[0] == title:
+                    return song_metadata
+        return None
