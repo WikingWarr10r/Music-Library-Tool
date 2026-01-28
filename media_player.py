@@ -84,6 +84,10 @@ class MediaPlayer:
         else:
             return "No song playing"
         
+    def song_details(self):
+        metadata = mutagen.File(f"{self.MUSIC_FOLDER}/{self.current_song}", easy=True)
+        print(f"{metadata.get('title')[0]} by {metadata.get('artist')[0]} - {self.get_time()}")
+        
     def start_looping(self):
         self.looping_song = self.current_song
     
