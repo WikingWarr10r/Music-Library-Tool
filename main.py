@@ -111,7 +111,7 @@ elif "play" in choice.lower():
                 print("Stopping")
                 break
             if action == "loop":
-                if not queue.is_empty():
+                if queue.is_empty():
                     media_player.start_looping()
                     print("Looping current song")
                 else:
