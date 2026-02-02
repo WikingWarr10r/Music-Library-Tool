@@ -1,12 +1,10 @@
-from media_player import MediaPlayer
 class MetadataEditor:
-    def __init__(self):
-        self.song = None
-
-    def rename_song(self, metadata):
+    @staticmethod
+    def rename_song(metadata):
         metadata["title"] = input("Enter New Title: ")
 
-    def set_artist(self, metadata):
+    @staticmethod
+    def set_artist(metadata):
         if "artist" in metadata:
             metadata["artist"] = input("Enter New Artist Name: ")
         elif "albumartist" in metadata:
@@ -14,5 +12,6 @@ class MetadataEditor:
         else:
             print("Unknown Format")
 
-    def set_album(self, metadata):
+    @staticmethod
+    def set_album(metadata):
         metadata["album"] = input("Enter New Album Title: ")

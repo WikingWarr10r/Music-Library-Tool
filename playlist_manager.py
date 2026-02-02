@@ -3,36 +3,36 @@ import time
 
 class PlaylistManager:
     def __init__(self, playlist_folder, media_player):
-        self.playlist_folder = playlist_folder
-        self.playlists = {}
+        self._PLAYLIST_FOLDER = playlist_folder
+        self._playlists = {}
 
-        self.current_playlist = ""
-        self.song_index = 0
-        self.media_player = media_player
+        self._current_playlist = ""
+        self._song_index = 0
+        self._media_player = media_player
 
     def load(self):
-        with open(f"{self.playlist_folder}/playlists.csv", newline="") as f:
+        with open(f"{self._PLAYLIST_FOLDER}/playlists.csv", newline="") as f:
             for row in csv.reader(f):
                 if not row:
                     continue
                 name = row[0]
                 songs = row[1:]
-                self.playlists[name] = songs
+                self._playlists[name] = songs
     
     def write_playlists(self):
-        with open(f"{self.playlist_folder}/playlists.csv", "w", newline="") as f:
+        with open(f"{self._PLAYLIST_FOLDER}/playlists.csv", "w", newline="") as f:
             writer = csv.writer(f)
-            for name, songs in self.playlists.items():
+            for name, songs in self._playlists.items():
                 writer.writerow([name, *songs])
     
     def create_playlist(self):
         playlist_name = input("Enter playlist name: ")
 
-        if playlist_name in self.playlists:
+        if playlist_name in self._playlists:
             print("Playlist already exists")
             return
 
-        self.media_player.preview_song_titles()
+        self._media_player.preview_song_titles()
 
         songs = []
         while True:
@@ -40,50 +40,50 @@ class PlaylistManager:
             if song == "":
                 break
 
-            if self.media_player.song_title_to_song(song) is not None:
+            if self._media_player.song_title_to_song(song) is not None:
                 songs.append(song)
             else:
                 print(f"The song {song} was not found")
 
-        self.playlists[playlist_name] = songs
+        self._playlists[playlist_name] = songs
         self.write_playlists()
 
     def get_playlist(self, name):
         if name.isdigit():
             index = int(name) - 1
-            playlist_names = list(self.playlists.keys())
+            playlist_names = list(self._playlists.keys())
 
             if 0 <= index < len(playlist_names):
-                self.current_playlist = playlist_names[index]
+                self._current_playlist = playlist_names[index]
             else:
                 print("Invalid playlist number")
                 return
         else:
-            if name not in self.playlists:
+            if name not in self._playlists:
                 print("Playlist not found")
                 return
-            self.current_playlist = name
+            self._current_playlist = name
 
-        self.song_index = 0
+        self._song_index = 0
 
     def get_song_in_playlist(self):
-        return self.playlists[self.current_playlist][self.song_index]
+        return self._playlists[self._current_playlist][self._song_index]
     
     def get_playlists(self):
-        return self.playlists
+        return self._playlists
     
     def get_tracklist(self):
-        return self.playlists[self.current_playlist][self.song_index:]
+        return self._playlists[self._current_playlist][self._song_index:]
 
     def next_song(self):
-        playlist = self.playlists[self.current_playlist]
-        self.song_index = (self.song_index + 1) % len(playlist)
+        playlist = self._playlists[self._current_playlist]
+        self._song_index = (self._song_index + 1) % len(playlist)
 
     def play_song(self):
-        self.media_player.play_song(self.media_player.song_title_to_song(self.get_song_in_playlist()))
+        self._media_player.play_song(self._media_player.song_title_to_song(self.get_song_in_playlist()))
 
     def run_playlist(self):
-        if self.media_player.get_finished():
+        if self._media_player.get_finished():
             self.next_song()
             self.play_song()
 

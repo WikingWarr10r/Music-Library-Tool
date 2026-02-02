@@ -15,8 +15,6 @@ playlist_manager.load()
 
 queue = MusicQueue(media_player)
 
-metadata_editor = MetadataEditor()
-
 choice = input("\nCreate playlist\nEdit metadata\nPlay songs\n")
 
 if "create" in choice.lower():
@@ -39,11 +37,11 @@ if "edit" in choice.lower():
                 media_player.preview_song_titles()
                 metadata = media_player.song_title_to_metadata(input("Enter song to edit: "))
             if action == "title":
-                metadata_editor.rename_song(metadata)
+                MetadataEditor.rename_song(metadata)
             if action == "artist":
-                metadata_editor.set_artist(metadata)
+                MetadataEditor.set_artist(metadata)
             if action == "album":
-                metadata_editor.set_album(metadata)
+                MetadataEditor.set_album(metadata)
             if action == "debug":
                 print(metadata)
             if action == "stop":
