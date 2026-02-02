@@ -13,23 +13,23 @@ class SongData:
 
 class DataManager:
     def __init__(self):
-        self.songs = []
+        self._songs = []
 
     def load(self):
-        self.songs = []
+        self._songs = []
         with open("play_history.json", "r", encoding="utf-8") as f:
             data = json.load(f)
             for track_name, track_data in data["tracks"].items():
-                self.songs.append(SongData(track_name, track_data))
+                self._songs.append(SongData(track_name, track_data))
     
     def sort_data(self):
         sort_by = input("Do you want to sort by last played or play count: ")
         if best_match(sort_by.lower().strip(), ["last played", "play count"])[0] == "last played":
-            self.songs.sort(key=lambda s: s.last_played, reverse=True)
+            self._songs.sort(key=lambda s: s.last_played, reverse=True)
         else:
-            self.songs.sort(key=lambda s: s.play_count, reverse=True)
+            self._songs.sort(key=lambda s: s.play_count, reverse=True)
     
     def display_data(self):
         print("Index | Title                     | Plays  | Last Played")
-        for index, song in enumerate(self.songs, start=1):
+        for index, song in enumerate(self._songs, start=1):
             print(f"{index:<5} | {song}")
