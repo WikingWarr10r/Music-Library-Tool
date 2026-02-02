@@ -2,11 +2,13 @@ from media_player import MediaPlayer
 from playlist_manager import PlaylistManager
 from metadata_editor import MetadataEditor
 from music_queue import MusicQueue
+from data_manager import DataManager
 from helpers import best_match
 import threading
 
 COMMANDS = ["pause", "unpause", "skip", "restart", "list", "time", "stop", "loop", "unloop", "play", "volume", "queue", "details", "help"]
 EDIT_COMMANDS = ["title", "artist", "album", "stop", "new", "help", "debug"]
+VIEW_COMMANDS = ["load", "sort", "view", "stop", "help"]
 
 media_player = MediaPlayer("music/")
 
@@ -15,11 +17,14 @@ playlist_manager.load()
 
 queue = MusicQueue(media_player)
 
-choice = input("\nCreate playlist\nEdit metadata\nPlay songs\n")
+data_manager = DataManager()
+
+choice = input("\nCreate playlist\nEdit metadata\nPlay songs\nView Song Data\n")
 
 if "create" in choice.lower():
     playlist_manager.create_playlist()
-if "edit" in choice.lower():
+
+elif "edit" in choice.lower():
     media_player.preview_song_titles()
     metadata = media_player.song_title_to_metadata(input("Enter song to edit: "))
     while True:
@@ -45,6 +50,7 @@ if "edit" in choice.lower():
             if action == "debug":
                 print(metadata)
             if action == "stop":
+                print("Stopping")
                 break
             if action == "help":
                 print("Available Actions:")
@@ -53,6 +59,34 @@ if "edit" in choice.lower():
             metadata.save()
         except Exception as e:
             print(f"An error occured: {e}")
+
+elif "view" in choice.lower():
+        action = ""
+        while True:
+            inp = input().strip().lower()
+            best = best_match(inp, VIEW_COMMANDS)
+
+            if best[1] < 4:
+                action = best[0]
+            else:
+                action = None
+                print(f"Unknown command, did you mean {best[0]}")
+
+            if action == "load":
+                data_manager.load()
+                print("Loaded song data")
+            if action == "sort":
+                data_manager.sort_data()
+                print("Sorted data")
+            if action == "view":
+                data_manager.display_data()
+            if action == "stop":
+                print("Stopping")
+                break
+            if action == "help":
+                print("Available Actions:")
+                for command in VIEW_COMMANDS:
+                    print(command)
 
 elif "play" in choice.lower():
     if "y" in input("Do you want to play a playlist: ").strip().lower():
