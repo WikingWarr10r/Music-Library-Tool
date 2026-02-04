@@ -10,12 +10,14 @@ COMMANDS = ["pause", "unpause", "skip", "restart", "list", "time", "stop", "loop
 EDIT_COMMANDS = ["title", "artist", "album", "stop", "new", "help", "debug"]
 VIEW_COMMANDS = ["load", "sort", "view", "stop", "help"]
 
-media_player = MediaPlayer("music/")
+stop_event = threading.Event()
 
-playlist_manager = PlaylistManager("playlists/", media_player)
+media_player = MediaPlayer("music/", stop_event)
+
+playlist_manager = PlaylistManager("playlists/", media_player, stop_event)
 playlist_manager.load()
 
-queue = MusicQueue(media_player)
+queue = MusicQueue(media_player, stop_event)
 
 data_manager = DataManager()
 
@@ -51,6 +53,7 @@ elif "edit" in choice.lower():
                 print(metadata)
             if action == "stop":
                 print("Stopping")
+                stop_event.set()
                 break
             if action == "help":
                 print("Available Actions:")
@@ -82,6 +85,7 @@ elif "view" in choice.lower():
                 data_manager.display_data()
             if action == "stop":
                 print("Stopping")
+                stop_event.set()
                 break
             if action == "help":
                 print("Available Actions:")
@@ -141,6 +145,7 @@ elif "play" in choice.lower():
                 print(media_player.get_time())
             if action == "stop":
                 print("Stopping")
+                stop_event.set()
                 break
             if action == "loop":
                 if queue.is_empty():

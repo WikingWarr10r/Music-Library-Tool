@@ -27,9 +27,10 @@ class Queue:
         return len(self._queue) - self._front
     
 class MusicQueue(Queue):
-    def __init__(self, media_player):
+    def __init__(self, media_player, stop_event):
         super().__init__()
         self._media_player = media_player
+        self.__stop_event = stop_event
 
     def add_to_queue(self, song_title):
         if song_title == "":
@@ -48,6 +49,9 @@ class MusicQueue(Queue):
 
     def queue_loop(self):
         while True:
+            if self.__stop_event.is_set():
+                break
+
             if self._media_player.get_finished():
                 self.play_next_song()
             time.sleep(0.1)

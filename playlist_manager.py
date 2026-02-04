@@ -2,13 +2,15 @@ import csv
 import time
 
 class PlaylistManager:
-    def __init__(self, playlist_folder, media_player):
+    def __init__(self, playlist_folder, media_player, stop_event):
         self._PLAYLIST_FOLDER = playlist_folder
         self._playlists = {}
 
         self._current_playlist = ""
         self._song_index = 0
         self._media_player = media_player
+
+        self.__stop_event = stop_event
 
     def load(self):
         with open(f"{self._PLAYLIST_FOLDER}/playlists.csv", newline="") as f:
@@ -89,5 +91,7 @@ class PlaylistManager:
 
     def playlist_loop(self):
         while True:
+            if self.__stop_event.is_set():
+                break
             self.run_playlist()
             time.sleep(0.1)

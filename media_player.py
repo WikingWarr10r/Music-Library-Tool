@@ -6,9 +6,15 @@ import json
 from pathlib import Path
 import datetime
 import time
-
+from threading import Event
 class MediaPlayer:
-    def __init__(self, music_folder):
+    def __init__(self, music_folder: str, stop_event:Event):
+        """Handles media playing and controlling the media including playing, pausing, looping.
+
+        Args:
+            music_folder (str): Path to the folder containing music files.
+            stop_event (Event): Threading event to stop threads cleanly.
+        """
         self._HISTORY = Path("play_history.json")
         self._MUSIC_FOLDER = music_folder
 
@@ -19,6 +25,10 @@ class MediaPlayer:
 
         self._sub_ms = 0
 
+        self.__stop_event = stop_event
+
+        mixer.init()
+
     def load_history(self):
         if not self._HISTORY.exists():
             return {"tracks": {}}
@@ -26,6 +36,8 @@ class MediaPlayer:
             return json.load(f)
 
     def play_song(self, song: str):
+        if song == "" or song == None:
+            return
         self._sub_ms = 0
         self._current_song = song
         data = self.load_history()
@@ -55,7 +67,6 @@ class MediaPlayer:
         with open(self._HISTORY, "w") as f:
             json.dump(data, f, indent=2)
 
-        mixer.init()
         mixer.music.load(song)
         mixer.music.play()
 
@@ -96,6 +107,8 @@ class MediaPlayer:
 
     def looping_loop(self):
         while True:
+            if self.__stop_event.is_set():
+                break
             if not self._looping_song == None:
                 if self.get_finished():
                     self._current_song = self._looping_song
