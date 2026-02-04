@@ -8,8 +8,10 @@ import datetime
 import time
 from threading import Event
 class MediaPlayer:
+    """Handles media playing and controlling the media including playing, pausing, looping.
+    """
     def __init__(self, music_folder: str, stop_event:Event):
-        """Handles media playing and controlling the media including playing, pausing, looping.
+        """Initialises the MediaPlayer with a music folder and a stop event.
 
         Args:
             music_folder (str): Path to the folder containing music files.
@@ -29,13 +31,23 @@ class MediaPlayer:
 
         mixer.init()
 
-    def load_history(self):
+    def load_history(self) -> dict:
+        """Loads the JSON play history file for editing stats
+
+        Returns:
+            dict: A dictionary containing the contents of the JSON play history file.
+        """
         if not self._HISTORY.exists():
             return {"tracks": {}}
         with open(self._HISTORY, "r") as f:
             return json.load(f)
 
     def play_song(self, song: str):
+        """Plays a song based on file name.
+
+        Args:
+            song (str): The filename of the song
+        """
         if song == "" or song == None:
             return
         self._sub_ms = 0
@@ -71,41 +83,67 @@ class MediaPlayer:
         mixer.music.play()
 
     def pause(self):
+        """Pauses current song.
+        """
         mixer.music.pause()
 
     def unpause(self):
+        """Unpauses current song.
+        """
         mixer.music.unpause()
 
     def stop(self):
+        """Stops current song.
+        """
         mixer.music.stop()
         self._current_song = ""
 
     def restart(self):
+        """Restarts current song.
+        """
         self._sub_ms = mixer.music.get_pos()
         mixer.music.set_pos(0)
 
     def get_finished(self) -> bool:
+        """Checks if the current song is finished.
+
+        Returns:
+            bool: A bool showing if the song is finished or not.
+        """
         if mixer.music.get_pos() == -1:
             return True
         return False
     
-    def get_time(self):
+    def get_time(self) -> str:
+        """Generates a formatted string showing how long is left of the current song in the form 00:00/00:00.
+
+        Returns:
+            str: A string representing the time into the song.
+        """
         if not self._current_song == None:
             return f"{time.strftime('%M:%S', time.gmtime((mixer.music.get_pos() - self._sub_ms) / 1000))}/{time.strftime('%M:%S', time.gmtime(self._length))}"
         else:
             return "No song playing"
         
     def song_details(self):
+        """Pretty prints details about the song including the title, artist and time remaining.
+        """
         metadata = mutagen.File(f"{self._MUSIC_FOLDER}/{self._current_song}", easy=True)
         print(f"{metadata.get('title')[0]} by {metadata.get('artist')[0]} - {self.get_time()}")
         
     def start_looping(self):
+        """Enables a flag for the looping thread to handle song looping.
+        """
         self._looping_song = self._current_song
     
     def stop_looping(self):
+        """Disables a flag for the looping thread to stop looping the current song.
+        """
         self._looping_song = None
 
     def looping_loop(self):
+        """Ran on a seperate thread and handles song looping by restarting the song whenever it finishes.
+        """
         while True:
             if self.__stop_event.is_set():
                 break
@@ -115,10 +153,17 @@ class MediaPlayer:
                     self.play_song(self._current_song)
             time.sleep(0.1)
 
-    def set_volume(self, volume):
+    def set_volume(self, volume: float):
+        """Sets the volume of a song to a certain value.
+
+        Args:
+            volume (float): A normalised float (0-1) which sets the volume of the music playing.
+        """
         mixer.music.set_volume(volume)
 
     def preview_song_titles(self):
+        """Prints all the songs in the music folder using their internal metadata names.
+        """
         songs = os.listdir(self._MUSIC_FOLDER)
         for sng in songs:
             song = f"{self._MUSIC_FOLDER}/{sng}"
@@ -130,7 +175,15 @@ class MediaPlayer:
             else:
                 print(f"Couldn't read metadata for {song}")
 
-    def song_title_to_song(self, title):
+    def song_title_to_song(self, title: str) -> str|None:
+        """Converts the internal metadata song title to the filename or None.
+
+        Args:
+            title (str): This is the internal metadata song title.
+
+        Returns:
+            str|None: The filename of the song or None.
+        """
         for song in os.listdir(self._MUSIC_FOLDER):
             song_metadata = mutagen.File(f"{self._MUSIC_FOLDER}/{song}", easy=True)
             if song_metadata:
@@ -138,7 +191,15 @@ class MediaPlayer:
                     return song
         return None
     
-    def song_title_to_metadata(self, title) -> dict:
+    def song_title_to_metadata(self, title: str) -> mutagen.File|None:
+        """Converts the internal metadata title to the full metadata of the song or None."
+
+        Args:
+            title (str): This is the internal metadata song title.
+
+        Returns:
+            mutagen.File|None: A mutagen file, similar to a dict containing the metadata of the song or None.
+        """
         for song in os.listdir(self._MUSIC_FOLDER):
             song_metadata = mutagen.File(f"{self._MUSIC_FOLDER}/{song}", easy=True)
             if song_metadata:
