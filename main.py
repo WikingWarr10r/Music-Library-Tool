@@ -6,6 +6,7 @@ from data_manager import DataManager
 from helpers import best_match
 import threading
 
+# List of potential commands for use with Levenshtein Distance Function
 COMMANDS = ["pause", "unpause", "skip", "restart", "list", "time", "stop", "loop", "unloop", "play", "volume", "queue", "details", "help"]
 EDIT_COMMANDS = ["title", "artist", "album", "stop", "new", "help", "debug"]
 VIEW_COMMANDS = ["load", "sort", "view", "stop", "help"]
@@ -23,14 +24,17 @@ data_manager = DataManager()
 
 choice = input("\nCreate playlist\nEdit metadata\nPlay songs\nView Song Data\n")
 
+# Create Playlists
 if "create" in choice.lower():
     playlist_manager.create_playlist()
 
+# Edit Metadata
 elif "edit" in choice.lower():
     media_player.preview_song_titles()
     metadata = media_player.song_title_to_metadata(input("Enter song to edit: "))
     while True:
         try:
+            # Runs commands, using Levenshtein distance to fix errors in spelling or prompt the user if the word was too difficult
             inp = input().strip().lower()
             best = best_match(inp, EDIT_COMMANDS)
 
@@ -63,9 +67,11 @@ elif "edit" in choice.lower():
         except Exception as e:
             print(f"An error occured: {e}")
 
+# View song data
 elif "view" in choice.lower():
         action = ""
         while True:
+            # Runs commands, using Levenshtein distance to fix errors in spelling or prompt the user if the word was too difficult
             inp = input().strip().lower()
             best = best_match(inp, VIEW_COMMANDS)
 
@@ -92,7 +98,9 @@ elif "view" in choice.lower():
                 for command in VIEW_COMMANDS:
                     print(command)
 
+# Play song/playlist
 elif "play" in choice.lower():
+    # Play a playlist and start the playlist thread
     if "y" in input("Do you want to play a playlist: ").strip().lower():
         for index, playlist in enumerate(playlist_manager.get_playlists()):
             print(f"{index+1}. {playlist}")
@@ -101,6 +109,7 @@ elif "play" in choice.lower():
 
         playlist_thread = threading.Thread(target=playlist_manager.playlist_loop,daemon=True)
         playlist_thread.start()
+    # Play a song from the music folder and start he looping and queue threads
     else:
         media_player.preview_song_titles()
         current_song = media_player.song_title_to_song(input("Enter song to play: "))
@@ -114,6 +123,7 @@ elif "play" in choice.lower():
 
     while True:
         try:
+            # Runs commands, using Levenshtein distance to fix errors in spelling or prompt the user if the word was too difficult
             inp = input().strip().lower()
             best = best_match(inp, COMMANDS)
 
@@ -136,6 +146,7 @@ elif "play" in choice.lower():
                 media_player.restart()
                 print("Restarting Song")
             if action == "list":
+                # Shows the next songs in the queue or the playlist depnding on which mode we're running
                 if queue.is_empty():
                     for index, song in enumerate(playlist_manager.get_tracklist()):
                         print(f"{index+1}. {song}")
@@ -171,5 +182,7 @@ elif "play" in choice.lower():
                 print("Available Actions:")
                 for command in COMMANDS:
                     print(command)
+        
+        # Exception Handling
         except Exception as e:
             print(f"An error occured: {e}")
