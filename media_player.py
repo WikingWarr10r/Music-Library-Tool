@@ -191,14 +191,14 @@ class MediaPlayer:
                     return song
         return None
     
-    def song_title_to_metadata(self, title: str) -> mutagen.File|None:
+    def song_title_to_metadata(self, title: str):
         """Converts the internal metadata title to the full metadata of the song or None."
 
         Args:
             title (str): This is the internal metadata song title.
 
         Returns:
-            mutagen.File|None: A mutagen file, similar to a dict containing the metadata of the song or None.
+            Any: A mutagen file, similar to a dict containing the metadata of the song or None.
         """
         for song in os.listdir(self._MUSIC_FOLDER):
             song_metadata = mutagen.File(f"{self._MUSIC_FOLDER}/{song}", easy=True)

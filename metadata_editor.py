@@ -1,23 +1,23 @@
-import mutagen
+from typing import Any
 class MetadataEditor:
     """Handles the editing of metadata with static methods.
     This system can handle any filetype that ``mutagen`` can handle.
     """
     @staticmethod
-    def rename_song(metadata: mutagen.File):
+    def rename_song(metadata: Any):
         """Renames a song from the metadata of that song.
 
         Args:
-            metadata (mutagen.File): The mutagen metadata file object to edit.
+            metadata (Any): The mutagen metadata file object to edit.
         """
         metadata["title"] = input("Enter New Title: ")
 
     @staticmethod
-    def set_artist(metadata: mutagen.File):
+    def set_artist(metadata: Any):
         """Changes the artist of a song from the metadata of that song.
 
         Args:
-            metadata (mutagen.File): The mutagen metadata file object to edit.
+            metadata (Any): The mutagen metadata file object to edit.
         """
         if "artist" in metadata:
             metadata["artist"] = input("Enter New Artist Name: ")
@@ -27,10 +27,10 @@ class MetadataEditor:
             print("Unknown Format")
 
     @staticmethod
-    def set_album(metadata: mutagen.File):
+    def set_album(metadata: Any):
         """Sets the album of a song from the metadata of that song.
 
         Args:
-            metadata (mutagen.File): The mutagen metadata file object to edit.
+            metadata (Any): The mutagen metadata file object to edit.
         """
         metadata["album"] = input("Enter New Album Title: ")
